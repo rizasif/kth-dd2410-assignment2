@@ -51,6 +51,7 @@ def kuka_IK(point, R, joint_positions):
     y = point[1]
     z = point[2]
     q = np.array(joint_positions) #it must contain 7 elements
+    point = np.transpose(np.matrix(point))
 
     for i in range(100):
     #while(True):
@@ -89,15 +90,21 @@ def kuka_IK(point, R, joint_positions):
        p6 = T6[0:3,3]
 
        P = np.dot(T7, np.transpose(np.matrix([0,0,0.078,1])))[0:3]
+       #P = np.transpose(P)
+       print("Immidiate P: {}".format(P))
+       print("Immidiate P Size: {}".format(np.shape(P)))
+       #P = [Pt[Pt[0,3]], Pt[1,3], Pt[2,3]]
        P[2] += 0.311
        
        R2 = [ [T7[0,0], T7[0,1], T7[0,2]], [T7[1,0], T7[1,1], T7[1,2]], [T7[2,0], T7[2,1], T7[2,2]] ]
-       X2 = [ T7[3,0], T7[3,1], T7[3,2]]
+       #X2 = [ T7[3,0], T7[3,1], T7[3,2]]
+       X2 = P
+
        #print(X2)
        #temp = np.array([0,0,0.078])
        #print(temp)
        #X2 = np.dot(X2,temp)
-       #print("{}".format(X2))
+       print("X2 {}".format(X2))
        #X2[0][2] += 0.311
        
        
@@ -115,17 +122,21 @@ def kuka_IK(point, R, joint_positions):
        sd = np.transpose(sd)
        ad = np.transpose(ad)
        
+       print ("Re params {} {} {} {} {} {}".format(ne,se,ae,nd,sd,ad))
 
-       Re = 0.5 * (np.cross(ne,nd) + np.cross(se,sd) + np.cross(ae,ad))
-       
+       Re = 0.5 * (np.cross(ne,nd) + np.cross(se,sd) + np.cross(ae,ad))       
+
        #X error
+       print("point: {}".format(point))
+       print("point size: {}".format(np.shape(point)))
        Xe = X2 - point
+
+       Xe = np.matrix(Xe)
+       Re = np.transpose(np.matrix(Re))
        print("shape Xe {}".format(np.shape(Xe)))
        print("shape Re {}".format(np.shape(Re)))
-       Xe = np.transpose(np.matrix(Xe))
-       Re = np.transpose(np.matrix(Re))
-       print(Xe)
-       print(Re)
+       print("Xe: {}".format(Xe))
+       print("Re: {}".format(Re))
 
        error = np.vstack((Xe,Re))
        #error = np.transpose(error)
